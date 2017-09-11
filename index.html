@@ -129,20 +129,35 @@
   		<script src="https://js.arcgis.com/3.21/"></script>
 		<script>dojoConfig = {parseOnLoad: true}</script>
 		<script>
-			var map, homebutton;
+			var map, homeButton, flAmbulance;
 			require([
 				"esri/map",
 				"esri/dijit/HomeButton",
+				"esri/layers/FeatureLayer",
 				"dojo/domReady!"
-			], function(Map, HomeButton) {
+			], function(Map, HomeButton, FeatureLayer) {
 				map = new Map("map", {
 					basemap: "gray",
 					center: [-82.44109, 35.6122],
 					zoom: 5
 				});
 				
-				homebutton = new HomeButton({map: map}, "HomeButton");
-				homebutton.startup();
+				var flAmbulance_url = "https://sampleserver6.arcgisonline.com/arcgis/rest/services/RedlandsEmergencyVehicles/FeatureServer/0";
+				
+				flAmbulance = new FeatureLayer(
+					flAmbulance_url,
+					{
+						mode: FeatureLayer.MODE_ONDEMAND,
+						outFields: ["*"],
+						visible: true,
+						id: "flAmbulance"
+					}
+				);
+				
+				map.addLayer(flAmbulance);
+				
+				homeButton = new HomeButton({map: map}, "HomeButton");
+				homeButton.startup();
 			});
 		</script>
 	</head>
