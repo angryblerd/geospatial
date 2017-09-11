@@ -14,7 +14,12 @@
 				width: 100%;
 				z-index: -1;
 			}
-
+			#HomeButton {
+				position: absolute;
+				top: 95px;
+				left: 20px;
+				z-index: 1;
+			}
 			.navbar {
 				position: fixed;
 				top: 20px;
@@ -124,9 +129,10 @@
   		<script src="https://js.arcgis.com/3.21/"></script>
 		<script>dojoConfig = {parseOnLoad: true}</script>
 		<script>
-			var map;
+			var map, homebutton;
 			require([
 				"esri/map",
+				"esri/dijit/HomeButton",
 				"dojo/domReady!"
 			], function(Map) {
 				map = new Map("map", {
@@ -134,6 +140,8 @@
 					center: [-82.44109, 35.6122],
 					zoom: 3
 				});
+				
+				homebutton = new HomeButton({map: map},
 			});
 		</script>
 	</head>
