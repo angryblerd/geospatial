@@ -134,14 +134,15 @@
 				"esri/map",
 				"esri/dijit/HomeButton",
 				"dojo/domReady!"
-			], function(Map) {
+			], function(Map, HomeButton) {
 				map = new Map("map", {
 					basemap: "gray",
 					center: [-82.44109, 35.6122],
 					zoom: 3
 				});
 				
-				homebutton = new HomeButton({map: map},
+				homebutton = new HomeButton({map: map}, "HomeButton");
+				homebutton.startup();
 			});
 		</script>
 	</head>
@@ -158,6 +159,7 @@
 			</div>
 		</div>
 		<div id="map">
+			<div id="HomeButton"></div>
 		</div>
 	</body>
 </html>
