@@ -12,13 +12,17 @@
 				padding: 0;
 				height: 100%;
 				width: 100%;
-				z-index: -1;
+			}
+			#borderContainer,
+			#mapContainer {
+				width: 100%;
+				height: 100%;
 			}
 			#HomeButton {
 				position: absolute;
 				top: 95px;
 				left: 20px;
-				z-index: 1;
+				z-index: 5;
 			}
 			.navbar {
 				position: fixed;
@@ -29,7 +33,7 @@
 				background-color: #333;
 				border-radius: 5px;
 			  	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-				z-index: 1;
+				z-index: 5;
 			}
 			.navbar .logo {
 				position: relative;
@@ -39,24 +43,23 @@
 				overflow: hidden;
 			}
 			.navbar .logo img {
-				padding: 10px 10px;
-				color: white;
-				height: 40px;
-				width: 40px;
+				padding: 7.5px 10px;
+				height: 35px;
+				width: 35px;
 			}
 			.navbar .title {
 				position: relative;
 				float: left;
 				height: 50px;
-				width: 200px;
+				width: 225px;
 				overflow: hidden;
 			}
 			.navbar .title span {
 				position: relative;
-				top: 12.5px;
+				top: 5px;
 				left: 15px;
-				font-family: Arial;
-				font-size: 24px;
+				font-family: Avenir;
+				font-size: 30px;
 				color: white;
 				letter-spacing: 5px;
 			}
@@ -66,37 +69,68 @@
 				top: 10px;
 			}
 			.navbar .menu button {
-				color: white;
+				color: #fefefe;
 				background-color: transparent;
 				border: none;
 				font-size: 30px;
 				margin-right: 10px;
 			}
-			.navbar .menu button:hover {
+			button:hover {
 				cursor: pointer;
 				opacity: 0.5;
 			}
-			.toolbench {
+			.toolbench-button {
+				background-color: #333;
 				position: fixed;
 				top: 20px;
 				right: 20px;
+				height: 50px;
+				width: 50px;
+				border-radius: 5px;
+			}
+			.esri-icon-down-arrow {
+				position: relative;
+				background-color: transparent;
+				color: #fefefe;
+				font-size: 35px;
+				border: 0;
+				top: 5px;
+				left: 2.5px;
+			}
+			.toolbench-modal {
+				display: none;
+				position: fixed;
+				z-index: 1;
+    			left: 0;
+				top: 0;
+				width: 100%;
+				height: 100%;
+				overflow: auto;
+				background-color: transparent;
+			}
+			.toolbench {
+				display: block;
+				position: absolute;
+				top: 60px;
+				right: 20px;
+				width: 50px;
+				min-height: 250px;
 				background-color: #333;
-				padding: 5px;
 				border-radius: 5px;
 				box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 				z-index: 1;
 			}
-			.toolbench button {
+			.toolbench [class*="esri-icon-"] {
+				display: block;
 				position: relative;
 				text-decoration: none;
-				background-color: transparent;
-				color: white;
-				font-size: 35px;
+				font-size: 30px;
 				border: 0;
-			}
-			.toolbench button:hover {
-				cursor: pointer;
-				opacity: 0.5;
+				padding: 15px 0px;
+				top: 10px;
+				left: 10px;
+				background-color: transparent;
+				color: #fefefe;
 			}
 			.esri-icon-up {
 				position: fixed;
@@ -108,10 +142,7 @@
 				background-color: transparent;
 				border: none;
 			}
-			.esri-icon-up:hover {
-				cursor: pointer;
-				opacity: 0.75;
-			}
+			
 			.esri-icon-handle-horizontal {
 				position: fixed;
 				bottom: 5px;
@@ -130,53 +161,94 @@
   		<script src="https://js.arcgis.com/3.21/"></script>
 		<script>dojoConfig = {parseOnLoad: true}</script>
 		<script>
-			var map, homeButton, flAmbulance;
+			var map, homeButton, openStreeMapLayer, lyrAmbulances;
 			require([
 				"esri/map",
 				"esri/dijit/HomeButton",
 				"esri/layers/FeatureLayer",
+				"esri/layers/OpenStreetMapLayer",
+				"dijit/layout/BorderContainer",
+				"dijit/layout/ContentPane",
+				"dijit/layout/TabContainer",
+				"dojo/on",
+				"dojo/dom",
+				"dojo/dom-class",
+				"dojo/query",
 				"dojo/domReady!"
-			], function(Map, HomeButton, FeatureLayer) {
-				map = new Map("map", {
-					basemap: "gray",
-					center: [-82.44109, 35.6122],
-					zoom: 6
+			], function(Map, HomeButton, FeatureLayer, OpenStreetMapLayer, BorderContainer, ContentPane, TabContainer, on, dom, domClass, query) {
+				var borderContainer = new BorderContainer({
+					style: "height: 100%; width: 100%;",
+					id: "borderContainer"
 				});
 				
-				var flAmbulance_url = "https://sampleserver6.arcgisonline.com/arcgis/rest/services/RedlandsEmergencyVehicles/FeatureServer/0";
+				var mapContainer = new ContentPane({
+					region: "center",
+					style: "width: 100%; height: 50%;",
+					id: "mapContainer"
+				});
 				
-				flAmbulance = new FeatureLayer(
-					flAmbulance_url,
-					{
-						mode: FeatureLayer.MODE_ONDEMAND,
-						outFields: ["*"],
-						visible: true,
-						id: "flAmbulance"
-					}
-				);
+				borderContainer.addChild(mapContainer);
 				
-				map.addLayer(flAmbulance);
+				map = new Map("map", {
+					center: [-101.44109, 40.6122],
+					zoom: 4
+				});
+				
+				openStreeMapLayer = new OpenStreetMapLayer();
+				
+				map.addLayer(openStreeMapLayer);
+				
+				lyrAmbulances = new FeatureLayer("https://sampleserver6.arcgisonline.com/arcgis/rest/services/RedlandsEmergencyVehicles/FeatureServer/1");
+				
+				map.addLayer(lyrAmbulances);
 				
 				homeButton = new HomeButton({map: map}, "HomeButton");
+				
 				homeButton.startup();
 			});
 		</script>
 	</head>
 	<body>
 		<div class="navbar">
-			<div class="logo"><img src="./SHIELD-Logo.png"/></div>
-			<div class="title"><span>C.S.T.P.H.B.</span></div>
+			<div class="logo"><img src="https://goo.gl/FpDZrE"/></div>
+			<div class="title"><span>S.H.I.E.L.D.</span></div>
 			<div class="menu">
 				<button class="esri-icon-layers"></button>
-				<button class="esri-icon-description"></button>
 			</div>
-			<div class="toolbench">
-				<button class="esri-icon-down-arrow"></button>
+			<div class="toolbench-button">
+				<button class="esri-icon-down-arrow" id="btn"></button>
+			</div>
+			<div class="toolbench-modal" id="tools-modal">
+				<div class="toolbench" id="tools">
+					<button class="esri-icon-edit"></button>
+					<button class="esri-icon-save"></button>
+					<button class="esri-icon-printer"></button>
+					<button class="esri-icon-zoom-out-fixed"></button>
+				</div>
 			</div>
 		</div>
-		<div id="map">
-			<div id="HomeButton"></div>
+		<div id="borderContainer">
+			<div id="mapContainer">
+				<div id="map">
+					<div id="HomeButton"></div>
+				</div>
+			</div>
 		</div>
+		<script>
+			var modal = document.getElementById("tools-modal");
+			var btnDropdown = document.getElementById("btn");
+			btnDropdown.onclick = function() {
+				if(modal.style.display === "none") {
+					modal.style.display = "block";
+				} else {
+					modal.style.display = "none";
+				}
+			}
+			window.onclick = function(event) {
+				if (event.target == modal) {
+					modal.style.display = "none";
+				}
+			}
+		</script>
 	</body>
 </html>
-	
