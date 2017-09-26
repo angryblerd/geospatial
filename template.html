@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+		<title>Template</title>
+		<style>
+			html, body {
+				height: 100%;
+				width: 100%;
+				margin: 0;
+				padding: 0;
+			}
+			.navigation {
+				position: fixed;
+				width: 100%;
+				height: 50px;
+				background-color: #333;
+				box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+				z-index: 1;
+			}
+			.top {
+				top: 0;
+			}
+			.bottom {
+				bottom: 0;
+			}
+			[class*="esri-icon-"] {
+				color: #fefefe;
+				font-size: 30px;
+			}
+			button {
+				background-color: transparent;
+				border: none;
+			}
+			button:hover {
+				cursor: pointer;
+				opacity: 0.75;
+			}
+			.esri-icon-globe {
+				position: fixed;
+				margin: 10px;
+			}
+			.top .title {
+				position: relative;
+				left: 50px;
+				top: 10px;
+				color: #fefefe;
+				font-family: Avenir;
+				font-size: 24px;
+				letter-spacing: 2px;
+			}
+			.esri-icon-layers {
+				position: fixed;
+				right: 0;
+				padding: 7.5px;
+				border-top: 2.5px solid transparent;
+				margin: 0;
+			}
+			.esri-icon-table {
+				position: fixed;
+				right: 0;
+				padding: 7.5px;
+				border-bottom: 2.5px solid transparent;
+			}
+			.esri-icon-menu, .esri-icon-close {
+				position: fixed;
+				left: 0;
+				padding: 7.5px;
+				border-bottom: 2.5px solid transparent;
+			}
+			.menu-drawer {
+				display: none;
+				position: fixed;
+				left: 0;
+				top: 40%;
+				bottom: 40%;
+				width: 50px;
+				background-color: #333;
+				border-radius: 0 5px 5px 0;
+				box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+				z-index: 2;
+			}
+			.menu-drawer [class*="esri-icon-"] {
+				margin-top: 7.5px;
+				padding: 10px 7.5px;
+				font-size: 30px;
+				border-left: 2.5px solid transparent;
+			}
+			.menu-drawer [class*="esri-icon-"]:hover {
+				border-left-color: white;
+			}
+			.table-drawer {
+				position: fixed;
+				display: none;
+				bottom: 7.5%;
+				left: 5%;
+				right: 5%;
+				height: 350px;
+				background-color: #333;
+				box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+			}
+		</style>
+		<link rel="stylesheet" href="https://js.arcgis.com/3.21/esri/css/esri.css">
+		<style type="text/css">
+			/* bring in the claro theme */
+			@import "//ajax.googleapis.com/ajax/libs/dojo/1.10.4/dijit/themes/claro/claro.css";
+		</style>		
+		<script src="https://js.arcgis.com/3.21/"></script>
+		<script src="ajax.googleapis.com/ajax/libs/dojo/1.12.1/dojo/dojo.js"></script>
+	
+		<script>dojoConfig = {parseOnLoad: true}</script>
+	
+		<script>
+			dojo.require("dijit.layout.TabContainer");
+			dojo.require("dijit.layout.ContentPane");
+		</script>
+	</head>
+	<body class="claro">
+		<div class="navigation top">
+			<span class="esri-icon-globe"></span>
+			<span class="title">ArcGIS Web Mapping Application</span>
+			<button class="esri-icon-layers" id="layers-button"></button>
+		</div>
+		<div class="navigation bottom">
+			<button class="esri-icon-table" id="table-button"></button>
+			<button class="esri-icon-menu" id="menu-button"></button>
+		</div>
+		<div class="menu-drawer" id="menu-items">
+			<button class="esri-icon-edit"></button>
+			<button class="esri-icon-printer"></button>
+			<button class="esri-icon-zoom-out-fixed"></button>
+		</div>
+		<div class="table-drawer" id="tables">
+		</div>
+		<script>
+			var buttonMenu = document.getElementById("menu-button");
+			buttonMenu.addEventListener("click", function() {
+				var drawer = document.getElementById("menu-items");
+				if (drawer.style.display === "none") {
+					drawer.style.display = "block";
+					buttonMenu.classList.add("esri-icon-close");
+					buttonMenu.classList.remove("esri-icon-menu");
+					buttonMenu.style.borderBottomColor = "white";
+				} else {
+					drawer.style.display = "none";
+					buttonMenu.classList.add("esri-icon-menu");
+					buttonMenu.classList.remove("esri-icon-close");
+					buttonMenu.style.borderBottomColor = "transparent";
+				}
+			})
+			var buttonTable = document.getElementById("table-button");
+			buttonTable.addEventListener("click", function() {
+				var table = document.getElementById("tables");
+				if (table.style.display === "none") {
+					table.style.display = "block";
+					buttonTable.style.borderBottomColor = "white";
+				} else {
+					table.style.display = "none";
+					buttonTable.style.borderBottomColor = "transparent";
+				}
+			});
+			var buttonLayers = document.getElementById("layers-button");
+			buttonLayers.addEventListener("click", function() {
+				if (buttonLayers.style.borderTopColor === "transparent") {
+					buttonLayers.style.borderTopColor = "white";
+				} else {
+					buttonLayers.style.borderTopColor = "transparent";
+				}
+			});
+		</script>
+	</body>
+</html>
